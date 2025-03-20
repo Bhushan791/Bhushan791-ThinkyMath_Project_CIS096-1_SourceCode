@@ -1,0 +1,13 @@
+4. Decimals – Understanding Decimal Numbers
+Decimal Place Values
+0.5 = 5 tenths, 0.25 = 25 hundredths, 0.125 = 125 thousandths
+Converting Fractions to Decimals
+1/2 = 0.5, 1/4 = 0.25, 3/5 = 0.6
+Divide numerator by denominator to convert any fraction into decimal.
+Operations on Decimals
+Addition & Subtraction (Align decimal points and calculate normally).
+Example: 2.56 + 1.4 = 3.96
+Multiplication (Ignore decimal, multiply normally, then place the decimal).
+Example: 2.5 × 1.2 → 25 × 12 = 300 → 3.00
+Division (Move decimal points to make divisor a whole number).
+Example: 5.4 ÷ 0.3 → Convert to 54 ÷ 3 = 18

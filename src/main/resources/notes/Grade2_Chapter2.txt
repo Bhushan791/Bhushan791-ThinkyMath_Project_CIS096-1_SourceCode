@@ -1,0 +1,15 @@
+➕ Chapter 2: Addition & Subtraction (2-Digit)
+🎯 What will we learn?
+
+Adding and subtracting two-digit numbers
+Carrying over in addition and borrowing in subtraction
+✨ Addition Example:
+45 + 32 = 77
+
+First add the ones place (5️⃣ + 2️⃣ = 7️⃣)
+Then add the tens place (4️⃣ + 3️⃣ = 7️⃣)
+✨ Subtraction Example:
+78 - 34 = 44
+
+First, subtract the ones place (8️⃣ - 4️⃣ = 4️⃣)
+Then, subtract the tens place (7️⃣ - 3️⃣ = 4️⃣)

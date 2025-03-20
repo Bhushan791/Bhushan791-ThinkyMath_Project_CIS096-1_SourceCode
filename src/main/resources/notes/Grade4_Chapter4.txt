@@ -1,0 +1,14 @@
+📏 Perimeter & Area
+🎯 What will we learn?
+
+Finding perimeter of shapes
+Understanding area
+✨ Perimeter = Sum of all sides! 🔄
+Example: Rectangle (5 cm × 3 cm)
+Perimeter = 5 + 3 + 5 + 3 = 16 cm
+
+✨ Area = Length × Width 📐
+Example: Rectangle (5 cm × 3 cm)
+Area = 5 × 3 = 15 cm²
+
+🚀 Tip: Square’s area formula: Side × Side 🎯

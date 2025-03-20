@@ -1,0 +1,24 @@
+2. Four Operations – Advanced Operations
+Addition & Subtraction of Large Numbers
+Arrange numbers in columns and add/subtract from right to left.
+Carry over for addition, borrow for subtraction.
+Example:
+47,382 + 25,716 = 73,098
+83,721 - 48,509 = 35,212
+
+Multiplication & Division of Large Numbers
+Multiplication: Break numbers using place value and multiply step by step.
+Example:
+236 × 12
+= (236 × 10) + (236 × 2)
+= 2,360 + 472
+= 2,832
+
+Division: Long division method is used for dividing large numbers.
+Example: 5,248 ÷ 4
+
+5 ÷ 4 → Quotient = 1, remainder = 1
+Bring down 2 → 12 ÷ 4 = 3
+Bring down 4 → 24 ÷ 4 = 6
+Bring down 8 → 8 ÷ 4 = 2
+Answer: 1,312

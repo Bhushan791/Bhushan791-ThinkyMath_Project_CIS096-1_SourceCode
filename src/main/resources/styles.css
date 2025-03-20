@@ -1,0 +1,5 @@
+/* styles.css */
+.emoji-text {
+    -fx-font-family: 'Segoe UI Emoji'; /* Or any emoji-supporting font */
+    -fx-font-size: 24px; /* Adjust size as needed */
+}

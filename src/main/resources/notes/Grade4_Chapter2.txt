@@ -1,0 +1,18 @@
+✖️➗ Multiplication & Division (Advanced)
+🎯 What will we learn?
+
+Multiplication with larger numbers
+Long division step-by-step
+✨ Multiplication Example:
+345 × 2 = 690
+Multiply each digit:
+
+5 × 2 = 10 (carry 1)
+4 × 2 = 8 + 1 = 9
+3 × 2 = 6
+✨ Division Example:
+128 ÷ 4 = 32
+1️⃣ Divide 12 by 4 → 3
+2️⃣ Bring down 8 → 8 ÷ 4 = 2
+✅ Answer: 32
+

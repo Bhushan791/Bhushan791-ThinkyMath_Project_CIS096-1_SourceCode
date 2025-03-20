@@ -1,0 +1,19 @@
+➕ Chapter 2: Addition & Subtraction (4-Digit)
+🎯 What will we learn?
+
+Adding and subtracting four-digit numbers
+Using carrying and borrowing for bigger numbers
+✨ Addition Example:
+3456 + 2789 = 6245
+
+Add the ones place (6️⃣ + 9️⃣ = 15 → carry over 1)
+Add the tens place (5️⃣ + 8️⃣ = 13 + 1 = 14 → carry over 1)
+Add the hundreds place (4️⃣ + 7️⃣ = 11 + 1 = 12 → carry over 1)
+Add the thousands place (3️⃣ + 2️⃣ = 5️⃣ + 1 = 6️⃣)
+✨ Subtraction Example:
+8765 - 4321 = 4444
+
+Subtract the ones place (5️⃣ - 1️⃣ = 4️⃣)
+Subtract the tens place (6️⃣ - 2️⃣ = 4️⃣)
+Subtract the hundreds place (7️⃣ - 3️⃣ = 4️⃣)
+Subtract the thousands place (8️⃣ - 4️⃣ = 4️⃣)

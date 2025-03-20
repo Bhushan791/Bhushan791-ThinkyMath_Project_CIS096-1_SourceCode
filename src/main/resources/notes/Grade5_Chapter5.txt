@@ -1,0 +1,21 @@
+5. Ratio & Percentage – Exploring Ratios and Percentages
+Understanding Ratios
+A ratio compares two quantities.
+Example: If a class has 10 boys and 15 girls, the ratio of boys to girls is 10:15, which simplifies to 2:3.
+Understanding Percentages
+Percentage means "per hundred".
+Formula: (Part/Whole) × 100
+Example: If a student scores 45 out of 50,
+Percentage = (45/50) × 100 = 90%
+Converting Between Fractions, Decimals, and Percentages
+Fraction to Percentage: Multiply by 100
+Example: 3/4 → (3/4) × 100 = 75%
+Decimal to Percentage: Move decimal two places right
+Example: 0.85 = 85%
+Percentage to Decimal: Move decimal two places left
+Example: 75% = 0.75
+Final Tips for Mastering Class 5 Mathematics:
+Practice daily – Math gets easier with regular problem-solving.
+Memorize key formulas – Helps solve problems faster.
+Understand concepts – Don’t just memorize, understand why formulas work.
+Check your work – Always double-check calculations to avoid mistakes.
