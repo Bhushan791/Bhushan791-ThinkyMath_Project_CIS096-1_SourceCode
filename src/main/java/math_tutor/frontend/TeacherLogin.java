@@ -21,33 +21,39 @@ import math_tutor.middleware.LoginHandler; // Import LoginHandler
 
 public class TeacherLogin {
 
-    private Home home; // Reference to the Home application
-    private LoginHandler loginHandler; // Add LoginHandler
+    private Home home; // Reference to the Home application, used to navigate between screens
+    private LoginHandler loginHandler; // Instance of LoginHandler to manage login functionality
 
+    // Constructor for TeacherLogin
     public TeacherLogin(Home home) {
-        this.home = home; // Store reference to Home instance
-        this.loginHandler = new LoginHandler(); // Initialize LoginHandler
+        this.home = home; // Store reference to the Home instance for navigation
+        this.loginHandler = new LoginHandler(); // Initialize LoginHandler to manage login functionality
     }
 
+    // Method to create and return the login view for teachers
     public StackPane getLoginView() {
-        StackPane root = new StackPane();
-        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #D4E4FF , #73A8E5);");
+        StackPane root = new StackPane(); // Create a StackPane as the root layout for the login screen
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #D4E4FF , #73A8E5);"); // Set a gradient background style
 
-        VBox content = createContent();
+        VBox content = createContent(); // Create the main content (title, input fields, buttons)
+
+        // Create wave-shaped background decorations (reused from StudentLogin)
         StudentLogin.WaveBackground waveBackground = new StudentLogin.WaveBackground();
-        Path topWave = waveBackground.createWavePath(Color.web("#FF69B4"), -190, true);
-        Path bottomWave = waveBackground.createWavePath(Color.web("#FF69B4"), 190, false);
+        Path topWave = waveBackground.createWavePath(Color.web("#FF69B4"), -190, true); // Create top wave decoration
+        Path bottomWave = waveBackground.createWavePath(Color.web("#FF69B4"), 190, false); // Create bottom wave decoration
 
-        Button backToHomeButton = createBackToHomeButton();
-        StackPane.setAlignment(backToHomeButton, Pos.TOP_LEFT);
-        StackPane.setMargin(backToHomeButton, new Insets(20));
+        Button backToHomeButton = createBackToHomeButton(); // Create a "Back to Home" button
+        StackPane.setAlignment(backToHomeButton, Pos.TOP_LEFT); // Position the button at the top-left corner
+        StackPane.setMargin(backToHomeButton, new Insets(20)); // Add margin around the button for better spacing
 
-        root.getChildren().addAll(topWave, bottomWave);
-        root.getChildren().add(content);
-        root.getChildren().add(backToHomeButton);
+        // Add all components (waves, content, and back button) to the root layout
+        root.getChildren().addAll(topWave, bottomWave); // Add wave decorations
+        root.getChildren().add(content); // Add main content (title, input fields, etc.)
+        root.getChildren().add(backToHomeButton); // Add the "Back to Home" button
 
-        return root;
+        return root; // Return the fully constructed login view as a StackPane
     }
+
 
     private Button createBackToHomeButton() {
         Button backButton = new Button("⬅ Back to Home 🏠");

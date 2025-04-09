@@ -1,6 +1,6 @@
 package math_tutor.frontend;
 
-import javafx.animation.ScaleTransition;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -13,9 +13,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import javafx.scene.shape.Circle; // Import Circle for animated background
 
 public class GradeSelection {
-
 
     private final String[] buttonColors = {
             "#FF6B6B", // Red
@@ -34,7 +34,6 @@ public class GradeSelection {
     };
 
     private AnchorPane root; // Define root here
-
     private Runnable backToDashboardHandler;
 
     public GradeSelection(Runnable backToDashboardHandler) {
@@ -49,6 +48,9 @@ public class GradeSelection {
                 new Stop(1, Color.web("#73A8E5"))
         );
         root.setBackground(new Background(new BackgroundFill(gradient, null, null)));
+
+        // Add animated background (example: subtle moving particles)
+        addAnimatedBackground();
 
         // Back button
         Button backButton = createBackButton();
@@ -65,6 +67,29 @@ public class GradeSelection {
 
         root.getChildren().addAll(backButton, centerContent);
         return root;
+    }
+
+    private void addAnimatedBackground() {
+        // Example: Add circles that move and fade
+        for (int i = 0; i < 15; i++) {
+            Circle particle = new Circle(Math.random() * root.getWidth(), Math.random() * root.getHeight(), Math.random() * 20 + 5, Color.WHITE.deriveColor(0, 1, 1, Math.random() * 0.3));
+            root.getChildren().add(particle);
+
+            // Animate the particle
+            TranslateTransition move = new TranslateTransition(Duration.millis((Math.random() * 5 + 2) * 1000), particle);
+            move.setToX(Math.random() * root.getWidth() - particle.getCenterX());
+            move.setToY(Math.random() * root.getHeight() - particle.getCenterY());
+            move.setAutoReverse(true);
+            move.setCycleCount(Animation.INDEFINITE);
+
+            FadeTransition fade = new FadeTransition(Duration.millis((Math.random() * 5 + 2) * 1000), particle);
+            fade.setToValue(0);
+            fade.setAutoReverse(true);
+            fade.setCycleCount(Animation.INDEFINITE);
+
+            ParallelTransition animation = new ParallelTransition(move, fade);
+            animation.play();
+        }
     }
 
     private Button createBackButton() {
@@ -114,6 +139,14 @@ public class GradeSelection {
         title.setFont(Font.font("Comic Sans MS", 36));
         title.setStyle("-fx-font-weight: bold; -fx-fill: #ff1493;");
 
+        // Add a subtle animation to the title
+        FadeTransition fadeInOut = new FadeTransition(Duration.millis(2000), title);
+        fadeInOut.setFromValue(0.5);
+        fadeInOut.setToValue(1.0);
+        fadeInOut.setAutoReverse(true);
+        fadeInOut.setCycleCount(Animation.INDEFINITE);
+        fadeInOut.play();
+
         for (int i = 0; i < 5; i++) {
             Button gradeButton = createGradeButton(i + 1);
             buttonBox.getChildren().add(gradeButton);
@@ -139,15 +172,29 @@ public class GradeSelection {
         button.setCursor(Cursor.HAND);
 
         // Hover effects
-        button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: " + hoverColor + "; " +
-                        "-fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 15px 30px; " +
-                        "-fx-background-radius: 50; -fx-font-weight: bold; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 8, 0, 0, 5); " +
-                        "-fx-min-width: 240px;"
-        ));
+        button.setOnMouseEntered(e -> {
+            button.setStyle(
+                    "-fx-background-color: " + hoverColor + "; " +
+                            "-fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 15px 30px; " +
+                            "-fx-background-radius: 50; -fx-font-weight: bold; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 8, 0, 0, 5); " +
+                            "-fx-min-width: 240px;"
+            );
+            // Add a scale animation on hover
+            ScaleTransition scaleUp = new ScaleTransition(Duration.millis(200), button);
+            scaleUp.setToX(1.1);
+            scaleUp.setToY(1.1);
+            scaleUp.play();
+        });
 
-        button.setOnMouseExited(e -> button.setStyle(baseStyle));
+        button.setOnMouseExited(e -> {
+            button.setStyle(baseStyle);
+            // Add a scale animation on exit
+            ScaleTransition scaleDown = new ScaleTransition(Duration.millis(200), button);
+            scaleDown.setToX(1.0);
+            scaleDown.setToY(1.0);
+            scaleDown.play();
+        });
 
         // Click animation and action
         button.setOnMousePressed(event -> {
@@ -157,7 +204,6 @@ public class GradeSelection {
             st.setAutoReverse(true);
             st.setCycleCount(2);
             st.play();
-
             handleGradeSelection(grade);
         });
 
@@ -165,12 +211,6 @@ public class GradeSelection {
     }
 
     // In GradeSelection class
-// In GradeSelection class
-// In GradeSelection class
-// In GradeSelection class
-// In GradeSelection class
-// In GradeSelection class
-// Replace your current handleGradeSelection method with this one
     private void handleGradeSelection(int grade) {
         System.out.println("Selected Grade: " + grade);
 

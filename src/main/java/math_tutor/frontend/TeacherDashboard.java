@@ -5,8 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -19,38 +18,51 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import org.w3c.dom.ls.LSOutput;
+import math_tutor.backend.TestService;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 
 public class TeacherDashboard {
 
-    private Home home;
-    private String teacherName = "Sandhya Chaudhary"; // Default teacher name
-    private BorderPane dashboard;
+    private Home home; // Reference to the Home application, used to navigate between screens
+    private String teacherName = "Sandhya Chaudhary"; // Teacher's name, initialized as "Sandhya Chaudhary"
+    private BorderPane dashboard; // Reference to the dashboard layout for the teacher's interface
 
-    // Sample data class for student performance
+    // Inner class to store and manage student performance data
     public static class StudentPerformance {
-        private final String testId;
-        private final String studentId;
-        private final String grade;
+        private final String testId; // Unique ID for the test
+        private final String studentId; // Unique ID for the student
+        private final String testName; // Name of the test
+        private final String studentName; // Name of the student
+        private final String score; // The score obtained by the student
+        private final String completionDate; // Date when the test was completed
 
-        private final String name;
-        private final String score;
-
-        public StudentPerformance(String testId, String studentId, String grade, String name, String score) {
-            this.testId = testId;
-            this.studentId = studentId;
-            this.grade = grade;
-
-            this.name = name;
-            this.score = score;
+        // Constructor to initialize the student performance data
+        public StudentPerformance(String testId, String studentId, String testName,
+                                  String studentName, String score, String completionDate) {
+            this.testId = testId; // Set the test ID
+            this.studentId = studentId; // Set the student ID
+            this.testName = testName; // Set the test name
+            this.studentName = studentName; // Set the student's name
+            this.score = score; // Set the student's score
+            this.completionDate = completionDate; // Set the completion date of the test
         }
 
-        public String getTestId() { return testId; }
-        public String getStudentId() { return studentId; }
-        public String getGrade() { return grade; }
 
-        public String getName() { return name; }
+
+    public String getTestId() { return testId; }
+        public String getStudentId() { return studentId; }
+        public String getTestName() { return testName; }
+        public String getStudentName() { return studentName; }
         public String getScore() { return score; }
+        public String getCompletionDate() { return completionDate; }
     }
 
     public TeacherDashboard(Home home) {
@@ -64,16 +76,9 @@ public class TeacherDashboard {
 
     public BorderPane createDashboard() {
         dashboard = new BorderPane();
-
-        // Create top header
         dashboard.setTop(createHeader());
-
-        // Create main content with student performance table
         dashboard.setCenter(createMainContent());
-
-        // Create left sidebar with navigation
         dashboard.setLeft(createSidebar());
-
         return dashboard;
     }
 
@@ -298,15 +303,46 @@ public class TeacherDashboard {
 
         VBox performanceContent = new VBox(15);
 
+        HBox titleAndButtonBox = new HBox(15);
+        titleAndButtonBox.setAlignment(Pos.CENTER_LEFT);
+
         Text performanceTitle = new Text("Student Performance Overview 📊");
         performanceTitle.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 22));
         performanceTitle.setFill(Color.web("#FF1493"));
+
+        // Add PDF export button
+        Button exportPdfButton = new Button("📄 Export to PDF");
+        exportPdfButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; " +
+                "-fx-background-radius: 15; -fx-padding: 8px 15px; -fx-font-weight: bold; -fx-cursor: hand; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 2);");
+
+        // Add hover effects for export button
+        exportPdfButton.setOnMouseEntered(e ->
+                exportPdfButton.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-font-size: 14px; " +
+                        "-fx-background-radius: 15; -fx-padding: 8px 15px; -fx-font-weight: bold; -fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 4, 0, 0, 3);")
+        );
+
+        exportPdfButton.setOnMouseExited(e ->
+                exportPdfButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; " +
+                        "-fx-background-radius: 15; -fx-padding: 8px 15px; -fx-font-weight: bold; -fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 2);")
+        );
+
+        // Add spacer to push the button to the right
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        titleAndButtonBox.getChildren().addAll(performanceTitle, spacer, exportPdfButton);
 
         // Create table view for student performance
         TableView<StudentPerformance> performanceTable = createPerformanceTable();
         VBox.setVgrow(performanceTable, Priority.ALWAYS);
 
-        performanceContent.getChildren().addAll(performanceTitle, performanceTable);
+        // Add action to export PDF button
+        exportPdfButton.setOnAction(e -> exportToPdf(performanceTable));
+
+        performanceContent.getChildren().addAll(titleAndButtonBox, performanceTable);
         performancePane.getChildren().add(performanceContent);
 
         // Make the performance pane take up remaining space
@@ -315,6 +351,105 @@ public class TeacherDashboard {
         mainContent.getChildren().addAll(welcomePane, performancePane);
 
         return mainContent;
+    }
+
+    // Method to export table data to PDF
+    private void exportToPdf(TableView<StudentPerformance> table) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PDF File");
+
+        // Set default file name with timestamp
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        fileChooser.setInitialFileName("StudentProgress_" + timestamp + ".pdf");
+
+        // Set file extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Show save file dialog
+        File file = fileChooser.showSaveDialog(dashboard.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                // Create PDF document
+                Document document = new Document(PageSize.A4.rotate());
+                PdfWriter.getInstance(document, new FileOutputStream(file));
+                document.open();
+
+                // Add title
+                com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 18, com.itextpdf.text.Font.BOLD, new BaseColor(255, 105, 180));
+                Paragraph title = new Paragraph("ThinkyMath - Student Progress Report", titleFont);
+                title.setAlignment(Element.ALIGN_CENTER);
+                document.add(title);
+
+                // Add date and teacher info
+                com.itextpdf.text.Font infoFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.NORMAL);
+                Paragraph info = new Paragraph(
+                        "Generated by: " + teacherName + "\n" +
+                                "Date: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        infoFont);
+                info.setAlignment(Element.ALIGN_RIGHT);
+                document.add(info);
+
+                document.add(new Paragraph(" ")); // Empty space
+
+                // Create table
+                PdfPTable pdfTable = new PdfPTable(6); // 6 columns
+                pdfTable.setWidthPercentage(100);
+
+                // Set table header
+                com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD, BaseColor.WHITE);
+                BaseColor headerColor = new BaseColor(255, 20, 147); // Hot pink
+
+                // Add table headers
+                for (TableColumn<StudentPerformance, ?> column : table.getColumns()) {
+                    PdfPCell cell = new PdfPCell(new Phrase(column.getText(), headerFont));
+                    cell.setBackgroundColor(headerColor);
+                    cell.setPadding(5);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    pdfTable.addCell(cell);
+                }
+
+                // Add table data
+                com.itextpdf.text.Font cellFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10);
+                for (StudentPerformance performance : table.getItems()) {
+                    pdfTable.addCell(new Phrase(performance.getTestId(), cellFont));
+                    pdfTable.addCell(new Phrase(performance.getStudentId(), cellFont));
+                    pdfTable.addCell(new Phrase(performance.getTestName(), cellFont));
+                    pdfTable.addCell(new Phrase(performance.getStudentName(), cellFont));
+                    pdfTable.addCell(new Phrase(performance.getScore(), cellFont));
+                    pdfTable.addCell(new Phrase(performance.getCompletionDate(), cellFont));
+                }
+
+                document.add(pdfTable);
+
+                // Add footer
+                document.add(new Paragraph(" "));
+                Paragraph footer = new Paragraph("This is an automatically generated report from ThinkyMath Teacher Dashboard.",
+                        new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 8, com.itextpdf.text.Font.ITALIC));
+                footer.setAlignment(Element.ALIGN_CENTER);
+                document.add(footer);
+
+                document.close();
+
+                // Show success message
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Export Successful");
+                alert.setHeaderText("PDF Created Successfully");
+                alert.setContentText("The student progress report has been saved to:\n" + file.getAbsolutePath());
+                alert.showAndWait();
+
+            } catch (Exception ex) {
+                // Show error message
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Export Error");
+                alert.setHeaderText("Failed to generate PDF");
+                alert.setContentText("Error: " + ex.getMessage());
+                alert.showAndWait();
+                ex.printStackTrace();
+            }
+        }
     }
 
     private VBox createProfileContent() {
@@ -376,9 +511,6 @@ public class TeacherDashboard {
         Text phoneText = new Text("📱 Phone: (+977) 9848857475 ");
         phoneText.setFont(Font.font("Comic Sans MS", 14));
 
-
-
-
         contactDetails.getChildren().addAll(emailText, phoneText);
         contactBox.getChildren().addAll(contactLabel, contactDetails);
 
@@ -410,45 +542,44 @@ public class TeacherDashboard {
         return fieldBox;
     }
 
-
     private TableView<StudentPerformance> createPerformanceTable() {
         TableView<StudentPerformance> table = new TableView<>();
-        table.setStyle("-fx-font-family: 'Comic Sans MS'; -fx-font-size: 14px;");
 
-        // Create columns
+        // Define columns
         TableColumn<StudentPerformance, String> testIdCol = new TableColumn<>("Test ID");
         testIdCol.setCellValueFactory(new PropertyValueFactory<>("testId"));
-        testIdCol.setPrefWidth(100);
 
         TableColumn<StudentPerformance, String> studentIdCol = new TableColumn<>("Student ID");
         studentIdCol.setCellValueFactory(new PropertyValueFactory<>("studentId"));
-        studentIdCol.setPrefWidth(100);
 
-        TableColumn<StudentPerformance, String> gradeCol = new TableColumn<>("Grade");
-        gradeCol.setCellValueFactory(new PropertyValueFactory<>("grade"));
-        gradeCol.setPrefWidth(80);
+        TableColumn<StudentPerformance, String> testNameCol = new TableColumn<>("Test Name");
+        testNameCol.setCellValueFactory(new PropertyValueFactory<>("testName"));
 
-
-
-        TableColumn<StudentPerformance, String> nameCol = new TableColumn<>("Student Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameCol.setPrefWidth(180);
+        TableColumn<StudentPerformance, String> studentNameCol = new TableColumn<>("Student Name");
+        studentNameCol.setCellValueFactory(new PropertyValueFactory<>("studentName"));
 
         TableColumn<StudentPerformance, String> scoreCol = new TableColumn<>("Score");
         scoreCol.setCellValueFactory(new PropertyValueFactory<>("score"));
-        scoreCol.setPrefWidth(100);
 
-        table.getColumns().addAll(testIdCol, studentIdCol, gradeCol,  nameCol, scoreCol);
+        TableColumn<StudentPerformance, String> completionDateCol = new TableColumn<>("Completion Date");
+        completionDateCol.setCellValueFactory(new PropertyValueFactory<>("completionDate"));
 
-        // Add sample data
-        ObservableList<StudentPerformance> data = FXCollections.observableArrayList(
+        // Add columns to the table
+        table.getColumns().addAll(testIdCol, studentIdCol, testNameCol, studentNameCol, scoreCol, completionDateCol);
+        // Fetch data from TestService
+        ObservableList<StudentPerformance> data = FXCollections.observableArrayList();
+        for (TestService.StudentPerformanceEntry entry : TestService.getAllTestRecords()) {
+            data.add(new StudentPerformance(
+                    entry.getTestId(),
+                    entry.getStudentId(),
+                    entry.getTestName(),
+                    entry.getStudentName(),
+                    entry.getScore(),
+                    entry.getCompletionDate()
+            ));
+        }
 
-                new StudentPerformance("1", "1", "5th",  "Bhushan Bhatta", "100")
-
-
-        );
-
-        table.setItems(data);
+        table.setItems(data); // set the items
         return table;
     }
 }

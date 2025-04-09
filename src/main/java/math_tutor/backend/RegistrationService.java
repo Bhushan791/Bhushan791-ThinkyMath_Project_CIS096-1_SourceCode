@@ -6,15 +6,11 @@ import java.sql.SQLException;
 import java.sql.Date;
 
 public class RegistrationService {
-    private Connection connection;
-
-    public RegistrationService() {
-        this.connection = ConnectionDB.getInstance().getConnection();
-    }
 
     public boolean registerStudent(String name, String dob, String guardianName, String guardianContact, String username, String password) {
         String query = "INSERT INTO students (name, dob, guardian_name, guardian_contact, username, password) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = ConnectionDB.getInstance().getConnection(); // Get a new connection
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, name);
             preparedStatement.setDate(2, Date.valueOf(dob)); // Convert String to Date
             preparedStatement.setString(3, guardianName);

@@ -1,13 +1,14 @@
 package math_tutor.frontend;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
@@ -18,107 +19,90 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.geometry.Rectangle2D;
+import math_tutor.backend.TestService;
 
-public class Leaderboard extends Application {
-    private final String themeColor = "#FF6B6B";
-    private final String lightColor = "#D4E4FF";
-    private final String darkColor = "#73A8E5";
+import java.util.Arrays;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+public class Leaderboard {
+    private final String themeColor = "#FF6B6B"; // Main theme color used in the leaderboard interface
+    private final String lightColor = "#D4E4FF"; // Light color for gradient background
+    private final String darkColor = "#73A8E5"; // Dark color for gradient background
 
-    @Override
-    public void start(Stage primaryStage) {
-        showLeaderboard(primaryStage);
-    }
-
+    // Method to show the leaderboard on the primary stage (window)
     public void showLeaderboard(Stage primaryStage) {
-        VBox leaderboardContainer = createLeaderboardContent();
+        VBox leaderboardContainer = createLeaderboardContent(); // Create the content for the leaderboard (e.g., player scores)
 
-        // Create a background with a linear gradient
+        // Create a linear gradient background for the leaderboard
         LinearGradient gradient = new LinearGradient(
-                0, 0, 0, 1, true, null,
-                new Stop(0, Color.web(lightColor)),
-                new Stop(1, Color.web(darkColor))
+                0, 0, 0, 1, true, null, // Gradient goes vertically (from top to bottom)
+                new Stop(0, Color.web(lightColor)), // Starting color is lightColor
+                new Stop(1, Color.web(darkColor)) // Ending color is darkColor
         );
 
-        BackgroundFill backgroundFill = new BackgroundFill(
-                gradient,
-                CornerRadii.EMPTY,
-                Insets.EMPTY
-        );
-        Background background = new Background(backgroundFill);
+        // Apply the gradient as the background for the leaderboard container
+        BackgroundFill backgroundFill = new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY);
+        Background background = new Background(backgroundFill); // Set the background to the leaderboard container
         leaderboardContainer.setBackground(background);
 
-        // Get screen dimensions
+        // Get the screen size to maximize the window based on the screen resolution
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double screenWidth = screenBounds.getWidth();
-        double screenHeight = screenBounds.getHeight();
 
-        // Create the scene with the screen width and a fixed height
-        Scene scene = new Scene(leaderboardContainer, screenWidth, screenHeight);
+        // Create a new scene for the leaderboard and set its size to the screen width and height
+        Scene scene = new Scene(leaderboardContainer, screenBounds.getWidth(), screenBounds.getHeight());
 
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Leaderboard"); // Set title
-
-        // Maximize the stage
-        primaryStage.setMaximized(true);
-
-        primaryStage.show();
+        // Set the scene, title, and maximize the window
+        primaryStage.setScene(scene); // Set the scene to the primary stage
+        primaryStage.setTitle("Leaderboard"); // Set the window title to "Leaderboard"
+        primaryStage.setMaximized(true); // Maximize the window to fill the screen
+        primaryStage.show(); // Display the primary stage with the leaderboard content
     }
+
 
     public VBox createLeaderboardContent() {
         VBox leaderboardContainer = new VBox(20);
         leaderboardContainer.setAlignment(Pos.CENTER);
         leaderboardContainer.setPadding(new Insets(20, 40, 40, 40));
 
-        // Create title
+        // Enhanced Title Section
         Label titleLabel = new Label("LEADERBOARD");
-        titleLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 40));
+        titleLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 48));
         titleLabel.setTextFill(Color.web(themeColor));
         titleLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);");
 
-        // Create subtitle
         Label subtitleLabel = new Label("Top performing students this month");
-        subtitleLabel.setFont(Font.font("Poppins", FontWeight.NORMAL, 18));
+        subtitleLabel.setFont(Font.font("Poppins", FontWeight.NORMAL, 20));
         subtitleLabel.setTextFill(Color.web("#333333"));
-        subtitleLabel.setPadding(new Insets(0, 0, 20, 0));
+        subtitleLabel.setPadding(new Insets(0, 0, 30, 0));
 
-        // Dummy data for leaderboard
-        ObservableList<Student> leaderboardData = FXCollections.observableArrayList(
-                new Student(1, "Harry", 5, 80),
-                new Student(2, "Emma", 5, 75),
-                new Student(3, "Ron", 4, 65),
-                new Student(4, "Hermione", 5, 60),
-                new Student(5, "Luna", 3, 55),
-                new Student(6, "Draco", 4, 50),
-                new Student(7, "Neville", 3, 45),
-                new Student(8, "Ginny", 4, 40),
-                new Student(9, "Fred", 2, 35),
-                new Student(10, "George", 2, 30)
-        );
+        ObservableList<Student> leaderboardData = FXCollections.observableArrayList();
+        TestService.LeaderboardEntry[] entries = TestService.getLeaderboard().toArray(new TestService.LeaderboardEntry[0]);
 
-        // Create table with improved styling
+        // Sort entries by score in descending order
+        Arrays.sort(entries, (a, b) -> Integer.compare(b.score, a.score));
+
+        // Create Student objects with ranks
+        for (int i = 0; i < entries.length; i++) {
+            leaderboardData.add(new Student(
+                    i + 1, // Rank
+                    entries[i].getStudentName(),
+                    entries[i].getScore()
+            ));
+        }
+
         TableView<Student> leaderboardTable = new TableView<>();
         leaderboardTable.setItems(leaderboardData);
-        leaderboardTable.setPrefHeight(900); // Make table bigger
+        leaderboardTable.setPrefHeight(900);
         leaderboardTable.setStyle(
                 "-fx-background-color: rgba(255, 255, 255, 0.95); " +
-                        "-fx-background-radius: 20; " +
+                        "-fx-background-radius: 25; " +
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0, 0, 8); " +
                         "-fx-padding: 10; " +
                         "-fx-border-color: " + themeColor + "; " +
                         "-fx-border-width: 0 0 0 0; " +
-                        "-fx-border-radius: 20;"
+                        "-fx-border-radius: 25;"
         );
-
-        // Disable selection on the table
         leaderboardTable.setSelectionModel(null);
 
-
-        // Create and style columns with consistent width and alignment
         TableColumn<Student, Integer> rankCol = new TableColumn<>("Rank");
         rankCol.setCellValueFactory(new PropertyValueFactory<>("rank"));
         rankCol.setPrefWidth(120);
@@ -138,15 +122,6 @@ public class Leaderboard extends Application {
                         "-fx-padding: 10px 20px;"
         );
 
-        TableColumn<Student, Integer> gradeCol = new TableColumn<>("Grade");
-        gradeCol.setCellValueFactory(new PropertyValueFactory<>("grade"));
-        gradeCol.setPrefWidth(120);
-        gradeCol.setStyle(
-                "-fx-alignment: CENTER; " +
-                        "-fx-font-size: 16px; " +
-                        "-fx-padding: 10px;"
-        );
-
         TableColumn<Student, String> starsCol = new TableColumn<>("Stars");
         starsCol.setCellValueFactory(new PropertyValueFactory<>("starsWithIcon"));
         starsCol.setPrefWidth(120);
@@ -156,57 +131,40 @@ public class Leaderboard extends Application {
                         "-fx-padding: 10px;"
         );
 
-        leaderboardTable.getColumns().addAll(rankCol, nameCol, gradeCol, starsCol);
-
-        // Set row height and style for better spacing
+        leaderboardTable.getColumns().addAll(rankCol, nameCol, starsCol);
         leaderboardTable.setFixedCellSize(60);
-
-        // Apply consistent resize policy
         leaderboardTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Style the table header
         leaderboardTable.setStyle(leaderboardTable.getStyle() +
                 "-fx-table-header-background: linear-gradient(to bottom, " + lightColor + ", " + darkColor + "); " +
                 "-fx-table-cell-border-color: rgba(115, 168, 229, 0.3);"
         );
 
-        // Apply row styling with alternating colors and stable visibility
         leaderboardTable.setRowFactory(tv -> {
-            javafx.scene.control.TableRow<Student> row = new javafx.scene.control.TableRow<Student>() {
-                @Override
-                protected void updateItem(Student student, boolean empty) {
-                    super.updateItem(student, empty);
-                    if (empty || student == null) {
-                        setStyle("");
+            TableRow<Student> row = new TableRow<>();
+            row.itemProperty().addListener((obs, oldItem, newItem) -> {
+                if (newItem != null) {
+                    final Color lightGold = Color.rgb(255, 215, 0, 0.7);
+                    final Color lightRoyalBlue = Color.rgb(65, 105, 225, 0.7);
+                    final Color lightRubyRed = Color.rgb(224, 17, 95, 0.7);
+
+                    if (newItem.getRank() == 1) {
+                        row.setStyle("-fx-background-color: " + colorToHex(lightGold) + ";");
+                    } else if (newItem.getRank() == 2) {
+                        row.setStyle("-fx-background-color: " + colorToHex(lightRoyalBlue) + ";");
+                    } else if (newItem.getRank() == 3) {
+                        row.setStyle("-fx-background-color: " + colorToHex(lightRubyRed) + ";");
                     } else {
-                        // Define lighter versions of the highlight colors
-                        final Color lightGold = Color.rgb(255, 215, 0, 0.7);   // Lighter Gold
-                        final Color lightRoyalBlue = Color.rgb(65, 105, 225, 0.7); // Lighter Royal Blue
-                        final Color lightRubyRed = Color.rgb(224, 17, 95, 0.7);  // Lighter Ruby Red
-
-
-                        // Highlight top positions with graduated colors
-                        if (student.getRank() == 1) {
-                            setStyle("-fx-background-color: " + colorToHex(lightGold) + ";"); // Light Gold
-                        } else if (student.getRank() == 2) {
-                            setStyle("-fx-background-color: " + colorToHex(lightRoyalBlue) + ";"); // Light Royal Blue
-                        } else if (student.getRank() == 3) {
-                            setStyle("-fx-background-color:  " + colorToHex(lightRubyRed) + ";"); // Light Ruby Red
-                        } else if (getIndex() % 2 == 0) {
-                            setStyle("-fx-background-color: #F0F0F0;"); // Light gray
-                        } else {
-                            setStyle("-fx-background-color: #FFFFFF;"); // White
-                        }
-                        setCursor(javafx.scene.Cursor.DEFAULT); // Disable cursor change on hover
+                        row.setStyle("-fx-background-color: " + (row.getIndex() % 2 == 0 ? "#F0F0F0" : "#FFFFFF") + ";");
                     }
                 }
-            };
+            });
             return row;
         });
 
         leaderboardContainer.getChildren().addAll(titleLabel, subtitleLabel, leaderboardTable);
 
-        // Create legend for stars at the bottom
+        // Enhanced Legend Section
         HBox legendBox = new HBox(10);
         legendBox.setAlignment(Pos.CENTER_RIGHT);
         legendBox.setPadding(new Insets(20, 0, 0, 0));
@@ -216,13 +174,10 @@ public class Leaderboard extends Application {
         legendLabel.setFont(Font.font("Poppins", FontWeight.NORMAL, 14));
 
         legendBox.getChildren().add(legendLabel);
-
-        // Add legend to container
         leaderboardContainer.getChildren().add(legendBox);
         return leaderboardContainer;
     }
 
-    // Utility method to convert Color to Hex
     private String colorToHex(Color color) {
         return String.format("#%02x%02x%02x%02x",
                 (int) (color.getRed() * 255),
@@ -231,18 +186,14 @@ public class Leaderboard extends Application {
                 (int) (color.getOpacity() * 255));
     }
 
-
-    // Student class to represent leaderboard entries
     public static class Student {
         private final Integer rank;
         private final String name;
-        private final Integer grade;
         private final Integer stars;
 
-        public Student(Integer rank, String name, Integer grade, Integer stars) {
+        public Student(Integer rank, String name, Integer stars) {
             this.rank = rank;
             this.name = name;
-            this.grade = grade;
             this.stars = stars;
         }
 
@@ -254,10 +205,6 @@ public class Leaderboard extends Application {
             return name;
         }
 
-        public Integer getGrade() {
-            return grade;
-        }
-
         public Integer getStars() {
             return stars;
         }
@@ -266,5 +213,4 @@ public class Leaderboard extends Application {
             return stars + " ★";
         }
     }
-
 }

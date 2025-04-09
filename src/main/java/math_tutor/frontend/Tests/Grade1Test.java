@@ -2,228 +2,384 @@ package math_tutor.frontend.Tests;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import math_tutor.middleware.TestHandler;
+
+import java.time.LocalDate;
 
 public class Grade1Test {
 
-    private static final String[] questions = {
-            "What is the number that comes after 5?",
-            "What shape is a ball?",
-            "If I have 3 pencils and I add 2 more, how many pencils do I have now?",
-            "What is the time when the sun rises?",
-            "If I have 5 toys and I give away 1, how many toys do I have left?",
-            "What is the number that comes before 8?",
-            "What shape is a book?",
-            "If I have 2 blocks and I add 1 more, how many blocks do I have now?",
-            "What is the time when we usually have lunch?",
-            "If I have 4 crayons and I give away 1, how many crayons do I have left?",
-            "What is the number that comes after 9?",
-            "What shape is a coin?",
-            "If I have 1 toy car and I add 2 more, how many toy cars do I have now?",
-            "What is the time when we usually go to bed?",
-            "If I have 3 marbles and I give away 2, how many marbles do I have left?",
-            "What is the number that comes before 1?",
-            "What shape is a door?",
-            "If I have 5 stickers and I add 1 more, how many stickers do I have now?",
-            "What is the time when we usually have breakfast?",
-            "If I have 2 dolls and I give away 1, how many dolls do I have left?",
-            "What is the number that comes after 7?",
-            "What shape is a table?",
-            "If I have 1 book and I add 3 more, how many books do I have now?",
-            "What is the time when we usually go to school?"
-    };
+    // Test Configuration
+    private static final TestConfig TEST_CONFIG = new TestConfig();
 
-    private static final String[][] options = {
-            {"5", "6", "7", "8"},
-            {"Circle", "Square", "Triangle", "Rectangle"},
-            {"3", "4", "5", "6"},
-            {"Morning", "Afternoon", "Evening", "Night"},
-            {"4", "5", "6", "7"},
-            {"6", "7", "8", "9"},
-            {"Square", "Circle", "Triangle", "Rectangle"},
-            {"2", "3", "4", "5"},
-            {"Afternoon", "Morning", "Evening", "Night"},
-            {"3", "4", "5", "6"},
-            {"9", "10", "11", "12"},
-            {"Circle", "Square", "Triangle", "Rectangle"},
-            {"1", "2", "3", "4"},
-            {"Night", "Morning", "Afternoon", "Evening"},
-            {"1", "2", "3", "4"},
-            {"0", "1", "2", "3"},
-            {"Rectangle", "Square", "Circle", "Triangle"},
-            {"5", "6", "7", "8"},
-            {"Morning", "Afternoon", "Evening", "Night"},
-            {"1", "2", "3", "4"},
-            {"7", "8", "9", "10"},
-            {"Rectangle", "Square", "Circle", "Triangle"},
-            {"1", "2", "3", "4"},
-            {"Morning", "Afternoon", "Evening", "Night"}
-    };
+    // UI Color Palette
+    private static class UIColors {
+        static final String LIGHT_COLOR = "#D4E4FF";
+        static final String DARK_COLOR = "#73A8E5";
+        static final String BUTTON_COLOR = "#fa009e";
+        static final String BUTTON_HOVER_COLOR = "#FF6B6B";
+        static final String BACKGROUND_GRADIENT =
+                "-fx-background-color: linear-gradient(to bottom right, " + LIGHT_COLOR + ", " + DARK_COLOR + ");";
+    }
 
-    private static final int[] correctAnswers = {
-            1, // 6
-            0, // Circle
-            2, // 5
-            0, // Morning
-            0, // 4
-            1, // 7
-            0, // Square
-            1, // 3
-            0, // Afternoon
-            0, // 3
-            1, // 10
-            0, // Circle
-            2, // 3
-            0, // Night
-            0, // 1
-            0, // 0
-            0, // Rectangle
-            1, // 6
-            0, // Morning
-            0, // 1
-            1, // 8
-            0, // Rectangle
-            2, // 4
-            0  // Morning
-    };
+    // Test Configuration Static Inner Class
+    private static class TestConfig {
+        static final String[] QUESTIONS = {
+                "What is the number that comes after 5?",
+                "What shape is a ball?",
+                "If I have 3 pencils and I add 2 more, how many pencils do I have now?",
+                "What is the time when the sun rises?",
+                "If I have 5 toys and I give away 1, how many toys do I have left?",
+                "What is 2 + 2?",
+                "What color is the sky on a clear day?",
+                "How many sides does a triangle have?",
+                "If I have 4 apples and I give away 2, how many apples do I have?",
+                "What is the opposite of up?"
+        };
 
-    private final String lightColor = "#D4E4FF";
-    private final String darkColor = "#73A8E5";
-    private final String buttonColor = "#fa009e";
-    private final String buttonHoverColor = "#FF6B6B";
+        static final String[][] OPTIONS = {
+                {"5", "6", "7", "8"},
+                {"Circle", "Square", "Triangle", "Rectangle"},
+                {"3", "4", "5", "6"},
+                {"Morning", "Afternoon", "Evening", "Night"},
+                {"4", "5", "6", "7"},
+                {"2", "3", "4", "5"},
+                {"Blue", "Green", "Red", "Yellow"},
+                {"2", "3", "4", "5"},
+                {"1", "2", "3", "4"},
+                {"Up", "Down", "Left", "Right"}
+        };
 
+        static final int[] CORRECT_ANSWERS = {1, 0, 2, 0, 0, 2, 0, 2, 2, 1};
+        static final int POINTS_PER_QUESTION = 10;
+        static final int TOTAL_QUESTIONS = QUESTIONS.length;
+    }
+
+    // UI Components
     private final BorderPane mainContainer;
     private final Runnable returnToTestSelection;
 
+    // Test State Variables
     private int currentQuestion = 0;
     private int score = 0;
+
+    // UI Elements
     private Label questionLabel;
     private RadioButton[] radioButtons;
     private ToggleGroup toggleGroup;
     private Button nextButton;
     private Button submitButton;
     private Label scoreLabel;
+    private Label questionNumberLabel;
 
-    public Grade1Test(BorderPane mainContainer, Runnable returnToTestSelection) {
+    // Student Information
+    private final String loggedInStudentName;
+    private final int loggedInStudentId;
+
+    // Constructor
+    public Grade1Test(BorderPane mainContainer,
+                      Runnable returnToTestSelection,
+                      String studentName,
+                      int studentId) {
         this.mainContainer = mainContainer;
         this.returnToTestSelection = returnToTestSelection;
+        this.loggedInStudentName = studentName;
+        this.loggedInStudentId = studentId;
     }
 
+    // Main method to show the test
     public void showTest() {
-        if (questions.length > 0 && options.length > 0 && correctAnswers.length > 0) {
-            BorderPane testLayout = new BorderPane();
-            testLayout.setStyle("-fx-background-color: linear-gradient(to bottom right, " + lightColor + ", " + darkColor + ");");
-
-            // Back button
-            Button backButton = createStyledButton("🔙 Back");
-            backButton.setOnAction(e -> returnToTestSelection.run());
-
-            VBox header = new VBox(backButton);
-            header.setPadding(new Insets(20));
-            header.setAlignment(Pos.TOP_LEFT);
-
-            // Question content
-            VBox content = new VBox(20);
-            content.setAlignment(Pos.CENTER);
-            content.setPadding(new Insets(20));
-
-            questionLabel = new Label(questions[currentQuestion]);
-            questionLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
-            questionLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
-
-            toggleGroup = new ToggleGroup();
-            radioButtons = new RadioButton[4];
-            for (int i = 0; i < 4; i++) {
-                radioButtons[i] = new RadioButton(options[currentQuestion][i]);
-                radioButtons[i].setToggleGroup(toggleGroup);
-                radioButtons[i].setFont(Font.font("Poppins", 18));
-                radioButtons[i].setTextFill(javafx.scene.paint.Color.YELLOW);
-            }
-
-            nextButton = createStyledButton("Next Question");
-            nextButton.setOnAction(e -> checkAnswer());
-
-            submitButton = createStyledButton("Submit Test");
-            submitButton.setOnAction(e -> submitTest());
-            submitButton.setVisible(false);
-
-            scoreLabel = new Label("Current Score: 0");
-            scoreLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 20));
-            scoreLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
-
-            content.getChildren().addAll(questionLabel);
-            content.getChildren().addAll(radioButtons);
-            content.getChildren().addAll(nextButton, submitButton, scoreLabel);
-
-            testLayout.setTop(header);
-            testLayout.setCenter(content);
-            mainContainer.setCenter(testLayout);
-        } else {
-            System.out.println("Arrays are not properly initialized.");
+        if (!isTestConfigValid()) {
+            showErrorAlert("Test configuration is invalid.");
+            return;
         }
+
+        BorderPane testLayout = createTestLayout();
+        mainContainer.setCenter(testLayout);
     }
 
+    // Validate Test Configuration
+    private boolean isTestConfigValid() {
+        return TEST_CONFIG.QUESTIONS.length > 0 &&
+                TEST_CONFIG.OPTIONS.length > 0 &&
+                TEST_CONFIG.CORRECT_ANSWERS.length > 0;
+    }
+
+    // Create Test Layout
+    private BorderPane createTestLayout() {
+        BorderPane testLayout = new BorderPane();
+        testLayout.setStyle(UIColors.BACKGROUND_GRADIENT);
+
+        VBox content = createTestContent();
+        testLayout.setTop(createHeader());
+        testLayout.setCenter(content);
+
+        return testLayout;
+    }
+
+    // Create Header with Back Button
+    private VBox createHeader() {
+        Button backButton = createStyledButton("🔙 Back");
+        backButton.setOnAction(e -> returnToTestSelection.run());
+
+        VBox header = new VBox(backButton);
+        header.setPadding(new Insets(20));
+        header.setAlignment(Pos.TOP_LEFT);
+
+        return header;
+    }
+
+    // Create Test Content
+    private VBox createTestContent() {
+        VBox content = new VBox(30);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(40));
+
+        questionNumberLabel = createQuestionNumberLabel();
+        questionLabel = createQuestionLabel();
+        VBox optionsBox = createOptionsBox();
+        VBox buttonBox = createButtonBox();
+        scoreLabel = createScoreLabel();
+
+        content.getChildren().addAll(
+                questionNumberLabel,
+                questionLabel,
+                optionsBox,
+                buttonBox,
+                scoreLabel
+        );
+
+        return content;
+    }
+
+    // Create Question Number Label
+    private Label createQuestionNumberLabel() {
+        Label label = new Label("Question " + (currentQuestion + 1) + " of " + TEST_CONFIG.TOTAL_QUESTIONS);
+        label.setFont(Font.font("Poppins", FontWeight.BOLD, 22));
+        label.setTextFill(Color.WHITE);
+        label.setBackground(createTransparentBackground(Color.rgb(0, 0, 0, 0.1), 5)); // Lighter Black Background, less curved
+        return label;
+    }
+
+    // Create Question Label
+    private Label createQuestionLabel() {
+        Label label = new Label(TEST_CONFIG.QUESTIONS[currentQuestion]);
+        label.setFont(Font.font("Poppins", FontWeight.BOLD, 28));
+        label.setTextFill(Color.WHITE);
+        label.setWrapText(true);
+        label.setMaxWidth(700);
+        label.setAlignment(Pos.CENTER);
+        label.setPadding(new Insets(15));
+        label.setBackground(createTransparentBackground(Color.web("#FF69B4"), 0.8)); // Changed to #FF69B4
+        label.setBorder(createSubtleBorder(Color.WHITE, 0.5));
+        return label;
+    }
+
+    // Create Options Box
+    private VBox createOptionsBox() {
+        VBox optionsBox = new VBox(15);
+        optionsBox.setAlignment(Pos.CENTER);
+        optionsBox.setPadding(new Insets(20));
+        optionsBox.setBackground(createTransparentBackground(Color.WHITE, 0.2));
+        // optionsBox.setBorder(null); // Removed the border
+
+        toggleGroup = new ToggleGroup();
+        radioButtons = new RadioButton[4];
+
+        for (int i = 0; i < 4; i++) {
+            radioButtons[i] = createRadioButton(TEST_CONFIG.OPTIONS[currentQuestion][i]);
+            optionsBox.getChildren().add(radioButtons[i]);
+        }
+
+        return optionsBox;
+    }
+
+    // Create Radio Button
+    private RadioButton createRadioButton(String text) {
+        RadioButton radioButton = new RadioButton(text);
+        radioButton.setToggleGroup(toggleGroup);
+        radioButton.setFont(Font.font("Poppins", FontWeight.MEDIUM, 22));
+        radioButton.setTextFill(Color.WHITE);
+        radioButton.setPrefWidth(400);
+        radioButton.setAlignment(Pos.CENTER_LEFT);
+        radioButton.setStyle(createRadioButtonStyle());
+        return radioButton;
+    }
+
+    // Create Button Box
+    private VBox createButtonBox() {
+        nextButton = createStyledButton("Next Question");
+        nextButton.setOnAction(e -> checkAnswer());
+
+        submitButton = createStyledButton("Submit Test");
+        submitButton.setOnAction(e -> submitTest());
+        submitButton.setVisible(false);
+
+        VBox buttonBox = new VBox(15);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(nextButton, submitButton);
+
+        return buttonBox;
+    }
+
+    // Create Score Label
+    private Label createScoreLabel() {
+        Label label = new Label("Current Score: 0");
+        label.setFont(Font.font("Poppins", FontWeight.BOLD, 22));
+        label.setTextFill(Color.WHITE);
+        return label;
+    }
+
+    // Check Answer and Progress
     private void checkAnswer() {
-        if (currentQuestion < questions.length) {
-            RadioButton selected = (RadioButton) toggleGroup.getSelectedToggle();
-            if (selected != null) {
-                int selectedIndex = -1;
-                for (int i = 0; i < 4; i++) {
-                    if (radioButtons[i].equals(selected)) {
-                        selectedIndex = i;
-                        break;
-                    }
-                }
-                if (selectedIndex == correctAnswers[currentQuestion]) {
-                    score += 4; // 4 points per question for 25 questions = 100 total
-                    scoreLabel.setText("Current Score: " + score);
-                }
-            }
+        RadioButton selected = (RadioButton) toggleGroup.getSelectedToggle();
+        if (selected == null) {
+            showErrorAlert("Please select an answer.");
+            return;
+        }
 
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                questionLabel.setText(questions[currentQuestion]);
-                for (int i = 0; i < 4; i++) {
-                    radioButtons[i].setText(options[currentQuestion][i]);
-                    radioButtons[i].setSelected(false);
-                }
-                toggleGroup.selectToggle(null);
-            } else {
-                questionLabel.setText("Test Completed!");
-                nextButton.setVisible(false);
-                submitButton.setVisible(true);
+        int selectedIndex = findSelectedOptionIndex(selected);
+
+        if (selectedIndex == TEST_CONFIG.CORRECT_ANSWERS[currentQuestion]) {
+            score += TEST_CONFIG.POINTS_PER_QUESTION;
+            scoreLabel.setText("Current Score: " + score);
+        }
+
+        currentQuestion++;
+        updateTestProgress();
+    }
+
+    // Find Selected Option Index
+    private int findSelectedOptionIndex(RadioButton selected) {
+        for (int i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].equals(selected)) {
+                return i;
             }
+        }
+        return -1;
+    }
+
+    // Update Test Progress
+    private void updateTestProgress() {
+        if (currentQuestion < TEST_CONFIG.TOTAL_QUESTIONS) {
+            updateQuestionContent();
         } else {
-            System.out.println("No more questions available.");
+            finalizeTest();
         }
     }
 
+    // Update Question Content
+    private void updateQuestionContent() {
+        questionNumberLabel.setText("Question " + (currentQuestion + 1) + " of " + TEST_CONFIG.TOTAL_QUESTIONS);
+        questionLabel.setText(TEST_CONFIG.QUESTIONS[currentQuestion]);
+        for (int i = 0; i < 4; i++) {
+            radioButtons[i].setText(TEST_CONFIG.OPTIONS[currentQuestion][i]);
+            radioButtons[i].setSelected(false);
+        }
+
+        toggleGroup.selectToggle(null);
+    }
+
+    // Finalize Test
+    private void finalizeTest() {
+        questionLabel.setText("Test Completed!");
+        nextButton.setVisible(false);
+        submitButton.setVisible(true);
+    }
+
+    // Submit Test
     private void submitTest() {
         scoreLabel.setText("Final Score: " + score + "/100");
         submitButton.setDisable(true);
-        // Add logic here to handle test submission, e.g., save score to database
+
+        TestHandler testHandler = new TestHandler();
+        LocalDate completionDate = LocalDate.now();
+
+        boolean isRecorded = testHandler.handleTestCompletion(
+                "Grade1Test",
+                loggedInStudentName,
+                loggedInStudentId,
+                score,
+                completionDate.toString()
+        );
+
+        if (isRecorded) {
+            showAlert("Test completed successfully! Your score has been recorded.", Alert.AlertType.INFORMATION);
+        } else {
+            showAlert("Failed to record your test. Please try again.", Alert.AlertType.ERROR);
+        }
     }
 
+    // Utility Methods for UI Styling
+    private Background createTransparentBackground(Color color, double opacity) {
+        return new Background(new BackgroundFill(
+                Color.web(color.toString(), opacity),
+                new CornerRadii(5), // Less Curved
+                Insets.EMPTY
+        ));
+    }
+
+    private Border createSubtleBorder(Color color, double opacity) {
+        return new Border(new BorderStroke(
+                Color.web(color.toString(), opacity),
+                BorderStrokeStyle.SOLID,
+                new CornerRadii(15),
+                BorderStroke.THIN
+        ));
+    }
+
+    // Styled Button Creation
+// Styled Button Creation
     private Button createStyledButton(String text) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: " + buttonColor + "; -fx-text-fill: yellow; -fx-font-size: 16px; " +
-                "-fx-background-radius: 15; -fx-font-weight: bold; -fx-padding: 8 15;");
+        button.setStyle(createButtonStyle(UIColors.BUTTON_COLOR));
 
-        // Store the original style to avoid redundancy
-        String originalStyle = button.getStyle();
-
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + buttonHoverColor + "; " +
-                originalStyle.substring(originalStyle.indexOf(";") + 1))); // Keep the rest of the style
-
-        button.setOnMouseExited(e -> button.setStyle(originalStyle)); // Reset to original style
+        button.setOnMouseEntered(e -> {
+            button.setCursor(javafx.scene.Cursor.HAND); // Set cursor to hand
+            button.setStyle(createButtonStyle(UIColors.BUTTON_HOVER_COLOR));
+        });
+        button.setOnMouseExited(e -> {
+            button.setCursor(javafx.scene.Cursor.DEFAULT); // Reset cursor
+            button.setStyle(createButtonStyle(UIColors.BUTTON_COLOR));
+        });
 
         return button;
+    }
+
+    // Button Style Generator
+    private String createButtonStyle(String backgroundColor) {
+        return String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 16px; " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 8 15;",
+                backgroundColor
+        );
+    }
+
+    // Radio Button Style Generator
+    private String createRadioButtonStyle() {
+        return "-fx-background-color: rgba(255, 255, 255, 0.1);" +
+                "-fx-background-radius: 10;" +
+                "-fx-border-color: rgba(255, 255, 255, 0.3);" +
+                "-fx-border-radius: 10;" +
+                "-fx-padding: 10 15;";
+    }
+
+    // Alert Dialogs
+    private void showAlert(String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showErrorAlert(String message) {
+        showAlert(message, Alert.AlertType.ERROR);
     }
 }

@@ -1,130 +1,119 @@
 package math_tutor.frontend;
 
+import javafx.animation.ScaleTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
+import math_tutor.backend.TestService;
+
+import java.util.Arrays;
 
 public class ProgressTracker {
+    private final String themeColor = "#FF6B6B";
     private final String lightColor = "#D4E4FF";
     private final String darkColor = "#73A8E5";
-    private final String themeColor = "#FF6B6B";
-    private final Runnable backToDashboard;
 
-    public ProgressTracker(Runnable backToDashboard) {
-        this.backToDashboard = backToDashboard;
-    }
-
-    public BorderPane createProgressTrackerContent() {
+    public BorderPane createProgressTrackerContent(StudentDashboard dashboard) {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: linear-gradient(to bottom right, " + lightColor + ", " + darkColor + ");");
 
-        // Add header with back button
-        HBox header = createHeader();
+        // Header with back button
+        Button backBtn = createNavButton("🔙 Back");
+        backBtn.setOnAction(e -> dashboard.showDashboardView());
+
+        HBox header = new HBox(backBtn);
+        header.setPadding(new Insets(20));
         root.setTop(header);
 
-        // Add main content (test progress table)
-        VBox content = createContent();
+        // Main content
+        VBox content = new VBox(20);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(40));
+        content.getChildren().addAll(createTitle(), createProgressTable(dashboard.getLoggedInUsername()));
         root.setCenter(content);
 
         return root;
     }
 
-    private HBox createHeader() {
-        // Create back button
-        Button backBtn = createNavButton("🔙 Back to Dashboard");
-        backBtn.setOnAction(e -> backToDashboard.run());
-
-        HBox header = new HBox(backBtn);
-        header.setPadding(new Insets(20));
-        header.setAlignment(Pos.CENTER_LEFT);
-
-        return header;
+    private Label createTitle() {
+        Label title = new Label("Your Test History");
+        title.setFont(Font.font("Poppins", FontWeight.BOLD, 36));
+        title.setTextFill(Color.web(themeColor));
+        title.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);");
+        return title;
     }
 
-    private VBox createContent() {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20, 40, 40, 40));
-        content.setAlignment(Pos.TOP_CENTER);
+    private TableView<TestHistory> createProgressTable(String username) {
+        ObservableList<TestHistory> testHistory = FXCollections.observableArrayList();
+        TestService.TestHistoryEntry[] entries = TestService.getTestHistory(username).toArray(new TestService.TestHistoryEntry[0]);
 
-        // Title
-        Label titleLabel = new Label("Your Test Progress");
-        titleLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 28));
-        titleLabel.setStyle("-fx-text-fill: white;");
+        // Sort entries by date in descending order
+        Arrays.sort(entries, (a, b) -> b.testDate.compareTo(a.testDate));
 
-        // Create table for test results
-        TableView<TestResult> tableView = createTable();
-        tableView.setMaxWidth(Double.MAX_VALUE); // Allow table to expand
-        tableView.setMaxHeight(Double.MAX_VALUE); // Allow table to expand vertically
+        // Create TestHistory objects
+        for (TestService.TestHistoryEntry entry : entries) {
+            testHistory.add(new TestHistory(
+                    entry.testDate,
+                    entry.testName,
+                    entry.score
+            ));
+        }
 
-        // Use a StackPane to center the table horizontally and vertically
-        StackPane tableContainer = new StackPane(tableView);
-        tableContainer.setPadding(new Insets(0, 20, 20, 20)); // Adjust padding for better spacing
+        TableView<TestHistory> table = new TableView<>();
+        table.setItems(testHistory);
+        table.setPrefHeight(600);
+        table.setStyle(
+                "-fx-background-color: rgba(255, 255, 255, 0.95); " +
+                        "-fx-background-radius: 25; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0, 0, 8); " +
+                        "-fx-padding: 10; " +
+                        "-fx-border-color: " + themeColor + "; " +
+                        "-fx-border-width: 0 0 0 0; " +
+                        "-fx-border-radius: 25;"
+        );
+        table.setSelectionModel(null);
 
-        content.getChildren().addAll(titleLabel, tableContainer);
-        return content;
-    }
+        TableColumn<TestHistory, String> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("testDate"));
+        dateCol.setPrefWidth(200);
+        dateCol.setStyle("-fx-alignment: CENTER; -fx-font-size: 14px; -fx-padding: 10px;");
 
-    private TableView<TestResult> createTable() {
-        TableView<TestResult> tableView = new TableView<>();
-        tableView.setStyle("-fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10;");
+        TableColumn<TestHistory, String> testNameCol = new TableColumn<>("Test Name");
+        testNameCol.setCellValueFactory(new PropertyValueFactory<>("testName"));
+        testNameCol.setPrefWidth(300);
+        testNameCol.setStyle("-fx-alignment: CENTER-LEFT; -fx-font-size: 14px; -fx-padding: 10px 20px;");
 
-        // Define columns
-        TableColumn<TestResult, String> testIdCol = new TableColumn<>("Test ID");
-        testIdCol.setCellValueFactory(new PropertyValueFactory<>("testId"));
-        testIdCol.setPrefWidth(150);
-
-        TableColumn<TestResult, String> studentIdCol = new TableColumn<>("Student ID");
-        studentIdCol.setCellValueFactory(new PropertyValueFactory<>("studentId"));
-        studentIdCol.setPrefWidth(120);
-
-        TableColumn<TestResult, String> studentNameCol = new TableColumn<>("Student Name");
-        studentNameCol.setCellValueFactory(new PropertyValueFactory<>("studentName"));
-        studentNameCol.setPrefWidth(150);
-
-        TableColumn<TestResult, String> gradeCol = new TableColumn<>("Grade");
-        gradeCol.setCellValueFactory(new PropertyValueFactory<>("grade"));
-        gradeCol.setPrefWidth(120);
-
-        TableColumn<TestResult, Integer> scoreCol = new TableColumn<>("Score out of 100");
+        TableColumn<TestHistory, String> scoreCol = new TableColumn<>("Score");
         scoreCol.setCellValueFactory(new PropertyValueFactory<>("score"));
         scoreCol.setPrefWidth(150);
-        scoreCol.setCellFactory(col -> new TableCell<TestResult, Integer>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item + " / 100");
-                }
-            }
-        });
+        scoreCol.setStyle("-fx-alignment: CENTER; -fx-font-size: 14px; -fx-padding: 10px;");
 
-        TableColumn<TestResult, Integer> starsCol = new TableColumn<>("Stars Earned");
-        starsCol.setCellValueFactory(new PropertyValueFactory<>("starsEarned"));
-        starsCol.setPrefWidth(120);
+        table.getColumns().removeAll(table.getColumns());
+        table.getColumns().addAll(dateCol, testNameCol, scoreCol);
+        table.setFixedCellSize(60);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        tableView.getColumns().addAll(testIdCol, studentIdCol, studentNameCol, gradeCol, scoreCol, starsCol);
-
-        // Add sample data
-        ObservableList<TestResult> data = FXCollections.observableArrayList(
-                new TestResult("MT_G1", "S001", "John Doe", "Grade 3", 85, 4),
-                new TestResult("MT_G2", "S002", "Jane Doe", "Grade 3", 78, 3),
-                new TestResult("MT_G3", "S003", "Bob Smith", "Grade 3", 92, 5),
-                new TestResult("MT_G4", "S004", "Alice Johnson", "Grade 4", 88, 4),
-                new TestResult("MT_G5", "S005", "Mike Brown", "Grade 4", 75, 3)
+        table.setStyle(table.getStyle() +
+                "-fx-table-header-background: linear-gradient(to bottom, " + lightColor + ", " + darkColor + "); " +
+                "-fx-table-cell-border-color: rgba(115, 168, 229, 0.3);"
         );
 
-        tableView.setItems(data);
-
-        return tableView;
+        return table;
     }
 
     private Button createNavButton(String text) {
@@ -137,39 +126,54 @@ public class ProgressTracker {
         btn.setOnMouseEntered(e -> {
             btn.setStyle("-fx-background-color: " + themeColor + "; -fx-text-fill: white; " +
                     "-fx-background-radius: 20; -fx-font-size: 16px; -fx-padding: 10 20;");
+            playScaleAnimation(btn, 1.05);
         });
 
         btn.setOnMouseExited(e -> {
             btn.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); -fx-text-fill: #333; " +
                     "-fx-background-radius: 20; -fx-font-size: 16px; -fx-padding: 10 20;");
+            playScaleAnimation(btn, 1.0);
         });
 
         return btn;
     }
 
-    // Model class for test results
-    public static class TestResult {
-        private final String testId;
-        private final String studentId;
-        private final String studentName;
-        private final String grade;
-        private final int score;
-        private final int starsEarned;
+    private void playScaleAnimation(Button button, double scale) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(150), button);
+        st.setToX(scale);
+        st.setToY(scale);
+        st.play();
+    }
 
-        public TestResult(String testId, String studentId, String studentName, String grade, int score, int starsEarned) {
-            this.testId = testId;
-            this.studentId = studentId;
-            this.studentName = studentName;
-            this.grade = grade;
+    private String colorToHex(Color color) {
+        return String.format("#%02x%02x%02x%02x",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                (int) (color.getOpacity() * 255));
+    }
+
+    public static class TestHistory {
+        private final String testDate;
+        private final String testName;
+        private final int score;
+
+        public TestHistory(String testDate, String testName, int score) {
+            this.testDate = testDate;
+            this.testName = testName;
             this.score = score;
-            this.starsEarned = starsEarned;
         }
 
-        public String getTestId() { return testId; }
-        public String getStudentId() { return studentId; }
-        public String getStudentName() { return studentName; }
-        public String getGrade() { return grade; }
-        public int getScore() { return score; }
-        public int getStarsEarned() { return starsEarned; }
+        public String getTestDate() {
+            return testDate;
+        }
+
+        public String getTestName() {
+            return testName;
+        }
+
+        public int getScore() {
+            return score;
+        }
     }
 }

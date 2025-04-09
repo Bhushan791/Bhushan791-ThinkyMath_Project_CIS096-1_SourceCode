@@ -11,46 +11,63 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.control.DatePicker;
 import math_tutor.middleware.RegistrationHandler;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StudentRegistration {
-    private Home home;
-    private RegistrationHandler registrationHandler;
+    private Home home; // Reference to the Home screen, used for navigation
+    private RegistrationHandler registrationHandler; // Handles registration logic
 
+    // Constructor for StudentRegistration, initializing the home reference and registration handler
     public StudentRegistration(Home home) {
-        this.home = home;
-        this.registrationHandler = new RegistrationHandler();
+        this.home = home; // Store reference to the Home instance for navigation purposes
+        this.registrationHandler = new RegistrationHandler(); // Initialize the registration handler for processing registration
     }
 
+    // Method to create and return the registration view
     public VBox getView() {
+        // Create a VBox container to hold all UI elements vertically
         VBox mainContainer = new VBox(15);
+        // Set the background style to a gradient color
         mainContainer.setStyle("-fx-background-color: linear-gradient(to bottom right, #D4E4FF , #73A8E5);");
+        // Set padding around the VBox container
         mainContainer.setPadding(new Insets(25));
+        // Align the contents to the top center of the VBox
         mainContainer.setAlignment(Pos.TOP_CENTER);
 
+        // Create header label for the registration page with a special font style and color
         Label headerLabel = new Label("✨ Register Now! ✨");
-        headerLabel.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 28));
-        headerLabel.setStyle("-fx-text-fill: #FF69B4;");
+        headerLabel.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 28)); // Set font style, size, and weight
+        headerLabel.setStyle("-fx-text-fill: #FF69B4;"); // Set text color
 
+        // Create subtitle label under the header with a different font style and color
         Label subtitleLabel = new Label("Join our lovely community! 🌸");
-        subtitleLabel.setFont(Font.font("Comic Sans MS", 14));
-        subtitleLabel.setStyle("-fx-text-fill: #9370DB;");
+        subtitleLabel.setFont(Font.font("Comic Sans MS", 14)); // Set font style and size
+        subtitleLabel.setStyle("-fx-text-fill: #9370DB;"); // Set subtitle text color
 
+        // Create a button to navigate back to the login page
         Button backButton = createBackToLoginButton();
+        // Create a VBox container for the registration form fields
         VBox formContainer = createFormContainer();
 
+        // Create form fields for student name, date of birth, guardian's name, and contact details
         FormField studentNameField = new FormField("Student's Name 📚");
         DatePicker dobDatePicker = createDatePicker("Date of Birth 🎂");
         FormField guardianNameField = new FormField("Guardian's Name 👪");
         FormField guardianContactField = new FormField("Guardian's Contact No. 📞");
         FormField usernameField = new FormField("Username 🌟");
 
+        // Create password fields with toggle visibility for password and confirmation
         PasswordFieldWithToggle passwordField = new PasswordFieldWithToggle("Password 🔒");
         PasswordFieldWithToggle confirmPasswordField = new PasswordFieldWithToggle("Confirm Password 🔒");
 
+        // Create a sign-up button with all necessary form fields for registration
         Button signUpButton = createSignUpButton(studentNameField, dobDatePicker, guardianNameField,
                 guardianContactField, usernameField,
                 passwordField, confirmPasswordField);
 
+        // Add all form field elements and the sign-up button to the form container
         formContainer.getChildren().addAll(
                 studentNameField.getTextField(),
                 dobDatePicker,
@@ -62,13 +79,18 @@ public class StudentRegistration {
                 signUpButton
         );
 
+        // Create a VBox container to hold the header and subtitle labels
         VBox headerContainer = new VBox(5, headerLabel, subtitleLabel);
-        headerContainer.setAlignment(Pos.CENTER);
+        headerContainer.setAlignment(Pos.CENTER); // Align the header contents to the center
 
+        // Create a StackPane container for the back button, placing it in the top-left corner
         StackPane topContainer = new StackPane(backButton);
-        StackPane.setAlignment(backButton, Pos.CENTER_LEFT);
+        StackPane.setAlignment(backButton, Pos.CENTER_LEFT); // Align back button to the top-left corner
 
+        // Add all UI components (back button, header, and form container) to the main container
         mainContainer.getChildren().addAll(topContainer, headerContainer, formContainer);
+
+        // Return the fully constructed registration view as a VBox
         return mainContainer;
     }
 
@@ -156,8 +178,21 @@ public class StudentRegistration {
                 return;
             }
 
+            if (!isValidPhoneNumber(guardianContact)) {
+                showAlert("Invalid phone number! 🌈", Alert.AlertType.ERROR);
+                return;
+            }
+
+            if (!isValidPassword(password)) {
+                showAlert("Password must contain at least one uppercase letter and one number! 🌈", Alert.AlertType.ERROR);
+                return;
+            }
+
+            //Date Format
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
             boolean isRegistered = registrationHandler.handleRegistration(
-                    studentName, dob.toString(), guardianName, guardianContact, username, password
+                    studentName, dob.format(dateFormatter), guardianName, guardianContact, username, password
             );
 
             if (isRegistered) {
@@ -169,6 +204,20 @@ public class StudentRegistration {
         });
 
         return signUpButton;
+    }
+
+    // Helper methods for validation
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        Pattern pattern = Pattern.compile("^\\d{10}$");
+        Matcher matcher = pattern.matcher(phoneNumber);
+        return matcher.matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        Pattern uppercase = Pattern.compile("[A-Z]");
+        Pattern number = Pattern.compile("[0-9]");
+
+        return uppercase.matcher(password).find() && number.matcher(password).find();
     }
 
     private void showAlert(String message, Alert.AlertType type) {

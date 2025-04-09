@@ -2,111 +2,69 @@ package math_tutor.frontend.Tests;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import math_tutor.middleware.TestHandler;
+import java.time.LocalDate;
 
 public class Grade2Test {
 
-    private static final String[] questions = {
-            "What is the place value of 7 in 57?",
-            "What is 45 + 32?",
-            "What is 68 - 23?",
-            "What is 9 + 8?",
-            "What is 50 - 25?",
-            "What is 6 × 4?",
-            "What is 36 ÷ 6?",
-            "If a pencil weighs 20 grams, how much do 5 pencils weigh?",
-            "How many centimeters are in a meter?",
-            "If you have 3 apples and you buy 2 more, how many apples do you have?",
-            "What is the number that comes after 29?",
-            "What is 72 + 18?",
-            "What is 90 - 45?",
-            "What is 5 × 3?",
-            "What is 24 ÷ 3?",
-            "If a bottle holds 1 liter, how many milliliters is that?",
-            "What is the length of a pencil if it is 15 cm long?",
-            "If you have 10 candies and you eat 3, how many do you have left?",
-            "What is 8 + 7?",
-            "What is 100 - 37?",
-            "What is 4 × 5?",
-            "What is 48 ÷ 8?",
-            "If a book costs $15 and you have $50, how much money will you have left after buying the book?",
-            "What is the weight of a 2 kg bag of flour in grams?",
-            "If you have 12 cookies and you give away 4, how many cookies do you have left?",
-            "What is 33 + 22?",
-            "What is 60 - 15?"
-    };
+    // ========== QUESTION DATA ========== //
+    private static final TestConfig TEST_CONFIG = new TestConfig();
 
-    private static final String[][] options = {
-            {"7", "50", "20", "30"},
-            {"77", "87", "97", "67"},
-            {"45", "55", "35", "25"},
-            {"15", "16", "17", "18"},
-            {"20", "25", "30", "35"},
-            {"24", "20", "30", "40"},
-            {"5", "6", "7", "8"},
-            {"80 grams", "100 grams", "120 grams", "60 grams"},
-            {"10", "100", "1000", "1"},
-            {"5", "4", "6", "7"},
-            {"30", "29", "28", "31"},
-            {"90", "100", "80", "70"},
-            {"50", "45", "55", "60"},
-            {"15", "12", "10", "9"},
-            {"8", "6", "7", "5"},
-            {"1000 ml", "100 ml", "10 ml", "1 ml"},
-            {"10 cm", "15 cm", "20 cm", "25 cm"},
-            {"7", "6", "5", "4"},
-            {"15", "16", "17", "18"},
-            {"60", "50", "40", "30"},
-            {"6", "8", "10", "12"},
-            {"5", "10", "15", "20"},
-            {"2000 grams", "1500 grams", "1000 grams", "500 grams"},
-            {"8", "6", "4", "2"},
-            {"55", "45", "35", "25"},
-            {"45", "50", "55", "60"}
-    };
+    // ========== UI COLORS ========== //
+    private static class UIColors {
+        static final String LIGHT_COLOR = "#D4E4FF";
+        static final String DARK_COLOR = "#73A8E5";
+        static final String BUTTON_COLOR = "#fa009e";
+        static final String BUTTON_HOVER_COLOR = "#FF6B6B";
+        static final String BACKGROUND_GRADIENT =
+                "-fx-background-color: linear-gradient(to bottom right, " + LIGHT_COLOR + ", " + DARK_COLOR + ");";
+    }
 
-    private static final int[] correctAnswers = {
-            0, // 7
-            1, // 77
-            1, // 45
-            2, // 17
-            1, // 25
-            0, // 24
-            0, // 6
-            1, // 100 grams
-            0, // 100
-            2, // 5
-            0, // 30
-            1, // 90
-            1, // 45
-            0, // 8
-            0, // 8
-            0, // 1000 ml
-            1, // 15 cm
-            0, // 7
-            1, // 23
-            0, // 20
-            0, // 6
-            0, // 2000 grams
-            1, // 8
-            0, // 55
-            1  // 45
-    };
+    // ========== TEST CONFIGURATION ========== //
+    private static class TestConfig {
+        static final String[] QUESTIONS = {
+                "What is the place value of 7 in 57?",
+                "What is 45 + 32?",
+                "What is 68 - 23?",
+                "What is 9 + 8?",
+                "What is 50 - 25?",
+                "What is 6 × 4?",
+                "What is 36 ÷ 6?",
+                "If a pencil weighs 20 grams, how much do 5 pencils weigh?",
+                "How many centimeters are in a meter?",
+                "If you have 3 apples and buy 2 more, how many apples do you have?"
+        };
 
-    private final String lightColor = "#D4E4FF";
-    private final String darkColor = "#73A8E5";
-    private final String buttonColor = "#fa009e";
-    private final String buttonHoverColor = "#FF6B6B";
+        static final String[][] OPTIONS = {
+                {"7", "50", "20", "30"},
+                {"77", "87", "97", "67"},
+                {"45", "55", "35", "25"},
+                {"15", "16", "17", "18"},
+                {"20", "25", "30", "35"},
+                {"24", "20", "30", "40"},
+                {"5", "6", "7", "8"},
+                {"80 grams", "100 grams", "120 grams", "60 grams"},
+                {"10", "100", "1000", "1"},
+                {"5", "4", "6", "7"}
+        };
 
+        static final int[] CORRECT_ANSWERS = {
+                0, 1, 1, 0, 1, 0, 1, 1, 1, 0
+        };
+        static final int POINTS_PER_QUESTION = 10;
+        static final int TOTAL_QUESTIONS = QUESTIONS.length;
+    }
+
+    // ========== COMPONENTS ========== //
     private final BorderPane mainContainer;
     private final Runnable returnToTestSelection;
+    private final String loggedInStudentName;
+    private final int loggedInStudentId;
 
     private int currentQuestion = 0;
     private int score = 0;
@@ -116,120 +74,303 @@ public class Grade2Test {
     private Button nextButton;
     private Button submitButton;
     private Label scoreLabel;
+    private Label questionNumberLabel;
 
-    public Grade2Test(BorderPane mainContainer, Runnable returnToTestSelection) {
+    // ========== CONSTRUCTOR ========== //
+    public Grade2Test(BorderPane mainContainer, Runnable returnToTestSelection,
+                      String studentName, int studentId) {
         this.mainContainer = mainContainer;
         this.returnToTestSelection = returnToTestSelection;
+        this.loggedInStudentName = studentName;
+        this.loggedInStudentId = studentId;
     }
 
+    // ========== TEST DISPLAY ========== //
     public void showTest() {
-        if (questions.length > 0 && options.length > 0 && correctAnswers.length > 0) {
-            BorderPane testLayout = new BorderPane();
-            testLayout.setStyle("-fx-background-color: linear-gradient(to bottom right, " + lightColor + ", " + darkColor + ");");
-
-            // Back button
-            Button backButton = createStyledButton("🔙 Back");
-            backButton.setOnAction(e -> returnToTestSelection.run());
-
-            VBox header = new VBox(backButton);
-            header.setPadding(new Insets(20));
-            header.setAlignment(Pos.TOP_LEFT);
-
-            // Question content
-            VBox content = new VBox(20);
-            content.setAlignment(Pos.CENTER);
-            content.setPadding(new Insets(20));
-
-            questionLabel = new Label(questions[currentQuestion]);
-            questionLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 24));
-            questionLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
-
-            toggleGroup = new ToggleGroup();
-            radioButtons = new RadioButton[4];
-            for (int i = 0; i < 4; i++) {
-                radioButtons[i] = new RadioButton(options[currentQuestion][i]);
-                radioButtons[i].setToggleGroup(toggleGroup);
-                radioButtons[i].setFont(Font.font("Poppins", 18));
-                radioButtons[i].setTextFill(javafx.scene.paint.Color.YELLOW);
-            }
-
-            nextButton = createStyledButton("Next Question");
-            nextButton.setOnAction(e -> checkAnswer());
-
-            submitButton = createStyledButton("Submit Test");
-            submitButton.setOnAction(e -> submitTest());
-            submitButton.setVisible(false);
-
-            scoreLabel = new Label("Current Score: 0");
-            scoreLabel.setFont(Font.font("Poppins", FontWeight.BOLD, 20));
-            scoreLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
-
-            content.getChildren().addAll(questionLabel);
-            content.getChildren().addAll(radioButtons);
-            content.getChildren().addAll(nextButton, submitButton, scoreLabel);
-
-            testLayout.setTop(header);
-            testLayout.setCenter(content);
-            mainContainer.setCenter(testLayout);
-        } else {
-            System.out.println("Arrays are not properly initialized.");
+        if (!isTestConfigValid()) {
+            showErrorAlert("Test configuration is invalid.");
+            return;
         }
+
+        BorderPane testLayout = createTestLayout();
+        mainContainer.setCenter(testLayout);
     }
 
+    // ========== VALIDATION ========== //
+    private boolean isTestConfigValid() {
+        return TEST_CONFIG.QUESTIONS.length > 0 &&
+                TEST_CONFIG.OPTIONS.length > 0 &&
+                TEST_CONFIG.CORRECT_ANSWERS.length > 0;
+    }
+
+    // ========== LAYOUT CREATION ========== //
+    private BorderPane createTestLayout() {
+        BorderPane testLayout = new BorderPane();
+        testLayout.setStyle(UIColors.BACKGROUND_GRADIENT);
+
+        VBox content = createTestContent();
+        testLayout.setTop(createHeader());
+        testLayout.setCenter(content);
+
+        return testLayout;
+    }
+
+    // ========== HEADER ========== //
+    private VBox createHeader() {
+        Button backButton = createStyledButton("🔙 Back");
+        backButton.setOnAction(e -> returnToTestSelection.run());
+
+        VBox header = new VBox(backButton);
+        header.setPadding(new Insets(20));
+        header.setAlignment(Pos.TOP_LEFT);
+
+        return header;
+    }
+
+    // ========== TEST CONTENT ========== //
+    private VBox createTestContent() {
+        VBox content = new VBox(30);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(40));
+
+        questionNumberLabel = createQuestionNumberLabel();
+        questionLabel = createQuestionLabel();
+        VBox optionsBox = createOptionsBox();
+        VBox buttonBox = createButtonBox();
+        scoreLabel = createScoreLabel();
+
+        content.getChildren().addAll(
+                questionNumberLabel,
+                questionLabel,
+                optionsBox,
+                buttonBox,
+                scoreLabel
+        );
+
+        return content;
+    }
+
+    // ========== QUESTION NUMBER LABEL ========== //
+    private Label createQuestionNumberLabel() {
+        Label label = new Label("Question " + (currentQuestion + 1) + " of " + TEST_CONFIG.TOTAL_QUESTIONS);
+        label.setFont(Font.font("Poppins", FontWeight.BOLD, 22));
+        label.setTextFill(Color.WHITE);
+        label.setBackground(createTransparentBackground(Color.rgb(0, 0, 0, 0.1), 5));
+        return label;
+    }
+
+    // ========== QUESTION LABEL ========== //
+    private Label createQuestionLabel() {
+        Label label = new Label(TEST_CONFIG.QUESTIONS[currentQuestion]);
+        label.setFont(Font.font("Poppins", FontWeight.BOLD, 28));
+        label.setTextFill(Color.WHITE);
+        label.setWrapText(true);
+        label.setMaxWidth(700);
+        label.setAlignment(Pos.CENTER);
+        label.setPadding(new Insets(15));
+        label.setBackground(createTransparentBackground(Color.web("#FF69B4"), 0.8));
+        label.setBorder(createSubtleBorder(Color.WHITE, 0.5));
+        return label;
+    }
+
+    // ========== OPTIONS BOX ========== //
+    private VBox createOptionsBox() {
+        VBox optionsBox = new VBox(15);
+        optionsBox.setAlignment(Pos.CENTER);
+        optionsBox.setPadding(new Insets(20));
+        optionsBox.setBackground(createTransparentBackground(Color.WHITE, 0.2));
+
+        toggleGroup = new ToggleGroup();
+        radioButtons = new RadioButton[4];
+
+        for (int i = 0; i < 4; i++) {
+            radioButtons[i] = createRadioButton(TEST_CONFIG.OPTIONS[currentQuestion][i]);
+            optionsBox.getChildren().add(radioButtons[i]);
+        }
+
+        return optionsBox;
+    }
+
+    // ========== RADIO BUTTON ========== //
+    private RadioButton createRadioButton(String text) {
+        RadioButton radioButton = new RadioButton(text);
+        radioButton.setToggleGroup(toggleGroup);
+        radioButton.setFont(Font.font("Poppins", FontWeight.MEDIUM, 22));
+        radioButton.setTextFill(Color.WHITE);
+        radioButton.setPrefWidth(400);
+        radioButton.setAlignment(Pos.CENTER_LEFT);
+        radioButton.setStyle(createRadioButtonStyle());
+        return radioButton;
+    }
+
+    // ========== BUTTON BOX ========== //
+    private VBox createButtonBox() {
+        nextButton = createStyledButton("Next Question");
+        nextButton.setOnAction(e -> checkAnswer());
+
+        submitButton = createStyledButton("Submit Test");
+        submitButton.setOnAction(e -> submitTest());
+        submitButton.setVisible(false);
+
+        VBox buttonBox = new VBox(15);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(nextButton, submitButton);
+
+        return buttonBox;
+    }
+
+    // ========== SCORE LABEL ========== //
+    private Label createScoreLabel() {
+        Label label = new Label("Current Score: 0");
+        label.setFont(Font.font("Poppins", FontWeight.BOLD, 22));
+        label.setTextFill(Color.WHITE);
+        return label;
+    }
+
+    // ========== ANSWER CHECKING ========== //
     private void checkAnswer() {
-        if (currentQuestion < questions.length) {
-            RadioButton selected = (RadioButton) toggleGroup.getSelectedToggle();
-            if (selected != null) {
-                int selectedIndex = -1;
-                for (int i = 0; i < 4; i++) {
-                    if (radioButtons[i].equals(selected)) {
-                        selectedIndex = i;
-                        break;
-                    }
-                }
-                if (selectedIndex == correctAnswers[currentQuestion]) {
-                    score += 4; // 4 points per question for 25 questions = 100 total
-                    scoreLabel.setText("Current Score: " + score);
-                }
-            }
+        RadioButton selected = (RadioButton) toggleGroup.getSelectedToggle();
+        if (selected == null) {
+            showErrorAlert("Please select an answer.");
+            return;
+        }
 
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                questionLabel.setText(questions[currentQuestion]);
-                for (int i = 0; i < 4; i++) {
-                    radioButtons[i].setText(options[currentQuestion][i]);
-                    radioButtons[i].setSelected(false);
-                }
-                toggleGroup.selectToggle(null);
-            } else {
-                questionLabel.setText("Test Completed!");
-                nextButton.setVisible(false);
-                submitButton.setVisible(true);
+        int selectedIndex = findSelectedOptionIndex(selected);
+
+        if (selectedIndex == TEST_CONFIG.CORRECT_ANSWERS[currentQuestion]) {
+            score += TEST_CONFIG.POINTS_PER_QUESTION;
+            scoreLabel.setText("Current Score: " + score);
+        }
+
+        currentQuestion++;
+        updateTestProgress();
+    }
+
+    // ========== FIND SELECTED OPTION INDEX ========== //
+    private int findSelectedOptionIndex(RadioButton selected) {
+        for (int i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].equals(selected)) {
+                return i;
             }
+        }
+        return -1;
+    }
+
+    // ========== TEST PROGRESS ========== //
+    private void updateTestProgress() {
+        if (currentQuestion < TEST_CONFIG.TOTAL_QUESTIONS) {
+            updateQuestionContent();
         } else {
-            System.out.println("No more questions available.");
+            finalizeTest();
         }
     }
 
+    // ========== QUESTION UPDATE ========== //
+    private void updateQuestionContent() {
+        questionNumberLabel.setText("Question " + (currentQuestion + 1) + " of " + TEST_CONFIG.TOTAL_QUESTIONS);
+        questionLabel.setText(TEST_CONFIG.QUESTIONS[currentQuestion]);
+        for (int i = 0; i < 4; i++) {
+            radioButtons[i].setText(TEST_CONFIG.OPTIONS[currentQuestion][i]);
+            radioButtons[i].setSelected(false);
+        }
+        toggleGroup.selectToggle(null);
+    }
+
+    // ========== TEST FINALIZATION ========== //
+    private void finalizeTest() {
+        questionLabel.setText("Test Completed!");
+        nextButton.setVisible(false);
+        submitButton.setVisible(true);
+    }
+
+    // ========== TEST SUBMISSION ========== //
     private void submitTest() {
         scoreLabel.setText("Final Score: " + score + "/100");
         submitButton.setDisable(true);
-        // Add logic here to handle test submission, e.g., save score to database
+
+        TestHandler testHandler = new TestHandler();
+        LocalDate completionDate = LocalDate.now();
+
+        boolean isRecorded = testHandler.handleTestCompletion(
+                "Grade2Test",
+                loggedInStudentName,
+                loggedInStudentId,
+                score,
+                completionDate.toString()
+        );
+
+        if (isRecorded) {
+            showAlert("Test completed successfully! Your score has been recorded.", Alert.AlertType.INFORMATION);
+        } else {
+            showAlert("Failed to record your test. Please try again.", Alert.AlertType.ERROR);
+        }
     }
 
+    // ========== UI UTILITIES ========== //
+    private Background createTransparentBackground(Color color, double opacity) {
+        return new Background(new BackgroundFill(
+                Color.web(color.toString(), opacity),
+                new CornerRadii(5),
+                Insets.EMPTY
+        ));
+    }
+
+    private Border createSubtleBorder(Color color, double opacity) {
+        return new Border(new BorderStroke(
+                Color.web(color.toString(), opacity),
+                BorderStrokeStyle.SOLID,
+                new CornerRadii(15),
+                BorderStroke.THIN
+        ));
+    }
+
+    // ========== RADIO BUTTON STYLE ========== //
+    private String createRadioButtonStyle() {
+        return "-fx-background-color: rgba(255, 255, 255, 0.1);" +
+                "-fx-background-radius: 10;" +
+                "-fx-border-color: rgba(255, 255, 255, 0.3);" +
+                "-fx-border-radius: 10;" +
+                "-fx-padding: 10 15;";
+    }
+
+    // ========== BUTTON STYLING ========== //
     private Button createStyledButton(String text) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: " + buttonColor + "; -fx-text-fill: yellow; -fx-font-size: 16px; " +
-                "-fx-background-radius: 15; -fx-font-weight: bold; -fx-padding: 8 15;");
+        button.setStyle(createButtonStyle(UIColors.BUTTON_COLOR));
 
-        // Store the original style to avoid redundancy
-        String originalStyle = button.getStyle();
-
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + buttonHoverColor + "; " +
-                originalStyle.substring(originalStyle.indexOf(";") + 1))); // Keep the rest of the style
-
-        button.setOnMouseExited(e -> button.setStyle(originalStyle)); // Reset to original style
+        button.setOnMouseEntered(e -> {
+            button.setCursor(javafx.scene.Cursor.HAND);
+            button.setStyle(createButtonStyle(UIColors.BUTTON_HOVER_COLOR));
+        });
+        button.setOnMouseExited(e -> {
+            button.setCursor(javafx.scene.Cursor.DEFAULT);
+            button.setStyle(createButtonStyle(UIColors.BUTTON_COLOR));
+        });
 
         return button;
+    }
+
+    // ========== BUTTON STYLE GENERATOR ========== //
+    private String createButtonStyle(String backgroundColor) {
+        return String.format(
+                "-fx-background-color: %s; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 16px; " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 8 15;",
+                backgroundColor
+        );
+    }
+
+    // ========== ALERTS ========== //
+    private void showAlert(String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showErrorAlert(String message) {
+        showAlert(message, Alert.AlertType.ERROR);
     }
 }
